@@ -1,6 +1,6 @@
-from engine.player import Player
 from engine.color import Color
 from engine.move import Move
+from engine.player import Player
 
 
 class HumanPlayer(Player):

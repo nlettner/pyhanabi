@@ -1,6 +1,7 @@
-from engine.color import Color
 from engine.card import Card, YourCard
+from engine.color import Color
 import pytest
+
 
 class TestCard:
     def test_init(self):

@@ -1,5 +1,5 @@
-from .color import Color
 from engine.card import Card
+from engine.color import Color
 from random import shuffle, Random
 
 

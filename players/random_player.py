@@ -1,5 +1,5 @@
-from engine.player import Player
 from engine.move import Move
+from engine.player import Player
 
 import random
 

@@ -1,5 +1,6 @@
 from engine.card import Card
-from cardstack import CardStack
+from engine.cardstack import CardStack
+
 
 class Board(object):
     def __init__(self, deck):

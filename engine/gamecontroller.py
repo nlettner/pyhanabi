@@ -1,9 +1,10 @@
 from engine.board import Board
-from engine.deck import (Deck, WildDeck)
-from engine.player import Player
-from engine.move import Move
 from engine.color import Color
+from engine.deck import (Deck, WildDeck)
 from engine.gamestate import (GameState, PlayerGameState)
+from engine.move import Move
+from engine.player import Player
+
 from itertools import cycle
 
 
