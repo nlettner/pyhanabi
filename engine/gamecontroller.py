@@ -1,8 +1,9 @@
 from engine.board import Board
-from engine.deck import Deck
+from engine.deck import (Deck, WildDeck)
 from engine.player import Player
 from engine.move import Move
-from engine.gamestate import GameState, PlayerGameState
+from engine.color import Color
+from engine.gamestate import (GameState, PlayerGameState)
 from itertools import cycle
 
 
@@ -16,7 +17,7 @@ class GameController(object):
         for player in players:
             if not isinstance(player, Player):
                 raise Exception("All players must inherit from the Player class.")
-        self.colors = ('r', 'y', 'g', 'w', 'b')  # TODO: rainbow/mixed/wilds
+        self.colors = (Color('red'), Color('yellow'), Color('green'), Color('white'), Color('blue'))  # TODO: rainbow/mixed/wilds
         self.numbers = (1, 1, 1, 2, 2, 3, 3, 4, 4, 5)
         self.players = players
         self.deck = Deck(colors=self.colors, numbers=self.numbers, seed=deck_seed)
@@ -33,17 +34,17 @@ class GameController(object):
                 self.player_hands[player].append(self.deck.draw_card())
         self.master_game_state.player_hands = self.player_hands
 
-    def game_over(self, player_id):
+    def are_all_stacks_complete(self):
+        return (len(self.colors)
+                == sum([1 for s in self.master_game_state.board.card_stacks.itervalues() if s.is_complete()]))
+
+    def is_game_over(self, player_id):
         # Check if we blew up
         if self.master_game_state.board.fuse_tokens < 1:
             print("no more fuses")
             return True
         # Check if we've completed all the stacks
-        completed_stacks = 0
-        for color, stack in self.master_game_state.board.card_stacks.iteritems():
-            if stack.is_complete():
-                completed_stacks += 1
-        if completed_stacks == len(self.colors):
+        if self.are_all_stacks_complete():
             print("You win!")
             return True
         # Check if the deck is done and everyone played their final turn:
@@ -67,7 +68,7 @@ class GameController(object):
             except AssertionError, e:
                 raise Exception(
                     "{p} submitted unplayable move: {m}".format(p=str(self.players[player_id]), m=str(new_move)), e)
-            if self.game_over(player_id):
+            if self.is_game_over(player_id):
                 game_score = self.master_game_state.board.compute_score()
                 print("Game over: Score {score}".format(score=game_score))
                 return game_score

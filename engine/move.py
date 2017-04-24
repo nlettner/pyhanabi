@@ -1,4 +1,6 @@
+from engine.color import Color
 from engine.gamestate import GameState
+
 
 class Move(object):
     """Moves must either play, discard or share information with another player about their hand.
@@ -28,6 +30,8 @@ class Move(object):
             assert information.has_key('player_id')
             assert information.has_key('information_type')
             assert information.has_key('information')
+            if information.get('information_type') == 'color':
+                assert isinstance(information.get('information'), Color)
             self.move_type = 'give_information'
             self.card_index = None
             self.information = information
@@ -62,7 +66,8 @@ class Move(object):
             target_hand = game_state.player_hands[target_player_id]
             information_detail = self.information['information']
             if self.information['information_type'] == 'color':
-                cards_to_reveal = [c for c in target_hand if c.color == information_detail]
+                assert isinstance(information_detail, Color)
+                cards_to_reveal = [c for c in target_hand if c.does_color_match(information_detail)]
                 if len(cards_to_reveal) < 1:
                     return False
             elif self.information['information_type'] == 'number':
@@ -93,7 +98,7 @@ class Move(object):
                 game_state.board.discard_card(player_card)
                 game_state.board.use_fuse_token()
         elif self.move_type == 'give_information':
-            #print("applying information")
+            # print("applying information")
             target_player = self.information['player_id']
             target_players_hand = game_state.player_hands[target_player]
             if self.information['information_type'] == 'number':
@@ -103,9 +108,10 @@ class Move(object):
                         card.make_public('number')
             elif self.information['information_type'] == 'color':
                 color = self.information['information']
+                assert isinstance(color, Color)
                 for card in target_players_hand:
-                    if card.color == color:
-                        card.make_public('color')
+                    if card.does_color_match(color):
+                        card.make_public('color', color)
             else:
                 raise Exception("tried to apply invalid move {m}".format(m=self))
             game_state.board.use_clock_token()

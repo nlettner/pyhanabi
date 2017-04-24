@@ -1,4 +1,5 @@
 from engine.player import Player
+from engine.color import Color
 from engine.move import Move
 
 
@@ -55,4 +56,4 @@ class HumanPlayer(Player):
                     information = raw_input("Enter a color from {c}".format(c=game_state.board.deck_colors))
                 return Move(move_type, game_state.get_my_id(), information={'player_id': int(player_id),
                                                                             'information_type': information_type,
-                                                                            'information': information})
+                                                                            'information': Color(information)})
