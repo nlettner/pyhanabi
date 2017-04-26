@@ -1,28 +1,46 @@
-class Color(object):
+from enum import Enum
 
-    def __init__(self, name, color_matches=None, match_name=True):
-        assert isinstance(name, str)
-        self.name = name
 
-        matches = set()
-        if color_matches is not None:
-            for color in color_matches:
-                matches.add(color)
+class MetaHanabiColor(type(Enum)):
 
-        if match_name:
-            matches.add(name)
+    color_count = 6  # Should be equal to the number of colors in the `HanabiColor` enum
 
-        self.match_set = frozenset(matches)
+    def __init__(self, cls, enum, members):
+        super(MetaHanabiColor, self).__init__(cls, enum, members)
 
-    def matches(self, colors):
-        if isinstance(colors, Color):
-            return colors.name in self.match_set
-        if isinstance(colors, str):
-            return colors in self.match_set
-        return not self.match_set.isdisjoint(colors)
+    def __contains__(self, item):
+        return item in self.__dict__
 
-    def __eq__(self, other):
-        return isinstance(other, Color) and self.name == other.name
+    def names(self):
+        for name in self._member_names_:
+            yield name
 
-    def __repr__(self):
-        return self.name
+
+class HanabiColor(Enum):
+    """An enum of Hanabi card colors."""
+    __metaclass__ = MetaHanabiColor
+
+    blue, green, red, white, yellow, wild = (None, None, None, None, None, 0)
+
+    def __init__(self, looks_like):
+        self.looks_like = looks_like
+        if self.name == 'wild':
+            self.looks_like = (self.blue | self.green | self.red | self.white | self.yellow)
+
+    def __new__(cls, *args, **kwargs):
+        obj = object.__new__(cls)
+        # Assign enum values to unique binary digits (000001, 000010, etc)
+        obj._value_ = 1 << len(cls.__members__)
+        return obj
+
+    def appears(self, other):
+        if self.looks_like is not None:
+            return (self.looks_like & other.value) != 0
+        else:
+            return self == other
+
+    def __or__(self, other):
+        return self.value | other.value
+
+    def __ror__(self, other):
+        return other | self.value

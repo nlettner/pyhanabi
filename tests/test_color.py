@@ -1,126 +1,119 @@
-from engine.color import Color
+from engine.color import HanabiColor
 import pytest
 
 
-@pytest.mark.parametrize("name,matches",
-                         [('red', None),
-                          ('green', None),
-                          ('wild', ('red', 'green'))])
-def test_init__name_set(name, matches):
-    """Test `Color` object `__init__`."""
+class TestHanabiColor(object):
 
-    color = Color(name, color_matches=matches)
-    assert color.name == name
+    def test_purple_element(self):
+        with pytest.raises(AttributeError):
+            color = HanabiColor.purple
 
+    def test_getitem_purple(self):
+        with pytest.raises(KeyError):
+            color = HanabiColor['purple']
 
-@pytest.mark.parametrize("name,matches",
-                         [('red', None),
-                          ('green', None),
-                          ('wild', ('red', 'green'))])
-def test_color_matches_self(name, matches):
-    """Test that a `Color` `matches` itself."""
+    @pytest.mark.parametrize('expected_element',
+                             ['blue',
+                              'green',
+                              'red',
+                              'white',
+                              'yellow',
+                              'wild'])
+    def test__names_gen(self, expected_element):
+        assert expected_element in HanabiColor.names()
 
-    color = Color(name, color_matches=matches)
-    assert color.matches(color)
+    @pytest.mark.parametrize('name,expected_item',
+                             [('blue', HanabiColor.blue),
+                              ('green', HanabiColor.green),
+                              ('red', HanabiColor.red),
+                              ('white', HanabiColor.white),
+                              ('yellow', HanabiColor.yellow),
+                              ('wild', HanabiColor.wild)])
+    def test__getitem(self, name, expected_item):
+        assert HanabiColor[name] == expected_item
 
+    def test__names(self):
+        name_list = list(HanabiColor.names())
+        assert len(name_list) == 6
+        for name in name_list:
+            assert isinstance(name, str)
 
-@pytest.mark.parametrize("name,matches",
-                         [('red', None),
-                          ('green', None),
-                          ('wild', ('red', 'green'))])
-def test_color_matches_str(name, matches):
-    """Test that a `Color` `matches` its own name."""
+    def test__correct_length(self):
+        assert len(HanabiColor) == 6
 
-    color = Color(name, color_matches=matches)
-    assert color.matches(color.name)
+    @pytest.mark.parametrize('name',
+                             ['blue',
+                              'green',
+                              'red',
+                              'white',
+                              'yellow',
+                              'wild'])
+    def test__contains_str_name(self, name):
+        assert name in HanabiColor
 
+    @pytest.mark.parametrize('name',
+                             [('purple',),
+                              ('orange',),
+                              ('turquoise',),
+                              ('magenta',),
+                              ('cyan',)])
+    def test__not_contains_str_name(self, name):
+        assert name not in HanabiColor
 
-@pytest.mark.parametrize("name,matches",
-                         [('red', None),
-                          ('green', None),
-                          ('wild', ('red', 'green'))])
-def test_color_match_name_false(name, matches):
-    """Test that a `Color` with `match_name=False` does matches neither `Color`s with the same name nor its own name."""
+    @pytest.mark.parametrize('element,expected_name',
+                             [(HanabiColor.blue, 'blue'),
+                              (HanabiColor.green, 'green'),
+                              (HanabiColor.red, 'red'),
+                              (HanabiColor.white, 'white'),
+                              (HanabiColor.yellow, 'yellow'),
+                              (HanabiColor.wild, 'wild')])
+    def test__name(self, element, expected_name):
+        assert element.name == expected_name
 
-    color = Color(name, color_matches=matches, match_name=False)
-    assert not color.matches(color.name)
-    assert not color.matches(color)
+    @pytest.mark.parametrize('element,expected_str',
+                             [(HanabiColor.blue, 'HanabiColor.blue'),
+                              (HanabiColor.green, 'HanabiColor.green'),
+                              (HanabiColor.red, 'HanabiColor.red'),
+                              (HanabiColor.white, 'HanabiColor.white'),
+                              (HanabiColor.yellow, 'HanabiColor.yellow'),
+                              (HanabiColor.wild, 'HanabiColor.wild')])
+    def test__str(self, element, expected_str):
+        assert str(element) == expected_str
 
+    @pytest.mark.parametrize('a,b',
+                             [(HanabiColor.blue, HanabiColor.green),
+                              (HanabiColor.green, HanabiColor.red),
+                              (HanabiColor.red, HanabiColor.white),
+                              (HanabiColor.white, HanabiColor.yellow),
+                              (HanabiColor.yellow, HanabiColor.blue),
+                              (HanabiColor.wild, HanabiColor.blue),
+                              (HanabiColor.wild, HanabiColor.green),
+                              (HanabiColor.wild, HanabiColor.red),
+                              (HanabiColor.wild, HanabiColor.white),
+                              (HanabiColor.wild, HanabiColor.yellow)])
+    def test__not_equal(self, a, b):
+        assert not a == b
 
-@pytest.mark.parametrize("color, not_expected",
-                         [(Color('red'), (Color('yellow'), 'white', Color('wild', ('red', 'green')))),
-                          (Color('blue'), (Color('red'), 'green', Color('wild', ('red', 'green')))),
-                          (Color('wild', ('red', 'blue')), ('yellow', Color('green'), 'white'))])
-def test_color_does_not_match(color, not_expected):
-    """Test that a `Color` does not match unexpected colors."""
-    assert isinstance(color, Color)
-    assert not_expected
-    for not_match in not_expected:
-        assert not color.matches(not_match)
+    @pytest.mark.parametrize('color,expected_appearance',
+                             [(HanabiColor.blue, HanabiColor.blue),
+                              (HanabiColor.green, HanabiColor.green),
+                              (HanabiColor.red, HanabiColor.red),
+                              (HanabiColor.white, HanabiColor.white),
+                              (HanabiColor.yellow, HanabiColor.yellow),
+                              (HanabiColor.wild, HanabiColor.blue),
+                              (HanabiColor.wild, HanabiColor.green),
+                              (HanabiColor.wild, HanabiColor.red),
+                              (HanabiColor.wild, HanabiColor.white),
+                              (HanabiColor.wild, HanabiColor.yellow),])
+    def test__appears(self, color, expected_appearance):
+        assert color.appears(expected_appearance)
 
-
-@pytest.mark.parametrize("color,expected_matches",
-                         [(Color('wild', ('red', 'green')), ('red', 'green', 'wild'))])
-def test_wild_matches_all(color, expected_matches):
-    """Test that a `Color` with many color matches correctly matches them."""
-    assert isinstance(color, Color)
-    assert expected_matches
-    for expected_match in expected_matches:
-        assert color.matches(expected_match)
-
-
-@pytest.mark.parametrize("color,expected_matches",
-                         [(Color('wild', ('red', 'green')), ('yellow', Color('white'), 'blue'))])
-def test_wild_not_match(color, expected_matches):
-    """Test that a `Color` with many color matches does not match other colors."""
-    assert isinstance(color, Color)
-    assert expected_matches
-    for expected_match in expected_matches:
-        assert not color.matches(expected_match)
-
-
-@pytest.mark.parametrize("color,match_any",
-                         [(Color('red'), (('red',), ('green', 'red'))),
-                          (Color('wild', ('red', 'green')),
-                           (('red',), ('blue', 'green'), ('wild', 'white'), ('red', 'green')))])
-def test_color_matches_any(color, match_any):
-    """Test that a `Color` matches a set of `str` that has color at least one names that matches."""
-    assert isinstance(color, Color)
-    assert match_any
-    for color_set in match_any:
-        assert color.matches(color_set)
-
-
-@pytest.mark.parametrize("color,match_none",
-                         [(Color('red'), (("blue",), ('wild',), ('yellow', 'green'))),
-                          (Color('wild', ('red', 'green')), (('yellow',), ('purple', 'blue'), ('blue', 'white')))])
-def test_color_matches_none(color, match_none):
-    """Test that a `Color` does not match a set of `str` that has no color names that match it."""
-    assert isinstance(color, Color)
-    assert match_none
-    for color_set in match_none:
-        assert not color.matches(color_set)
-
-
-@pytest.mark.parametrize("color_a,color_b",
-                         [(Color('red'), Color('green')),
-                          (Color('white'), Color('blue')),
-                          (Color('wild', ('red', 'blue')), Color('red')),
-                          (Color('wild', ('red', 'blue')), Color('blue'))])
-def test_not_eq(color_a, color_b):
-    """Test that `not color_a == color_b`."""
-    assert isinstance(color_a, Color)
-    assert isinstance(color_b, Color)
-    assert not color_a == color_b
-
-
-@pytest.mark.parametrize("color_a,color_b",
-                         [(Color('red'), Color('red')),
-                          (Color('wild', ('red', 'blue')), Color('wild')),
-                          (Color('wild', ('red', 'blue')), Color('wild', ('red', 'green'))),
-                          (Color('wild', ('red', 'blue')), Color('wild', ('red', 'blue')))])
-def test_eq(color_a, color_b):
-    """Test that 'color_a == color_b`."""
-    assert isinstance(color_a, Color)
-    assert isinstance(color_b, Color)
-    assert color_a == color_b
+    @pytest.mark.parametrize('color,unexpected_appearance',
+                             [(HanabiColor.blue, HanabiColor.green),
+                              (HanabiColor.green, HanabiColor.red),
+                              (HanabiColor.red, HanabiColor.white),
+                              (HanabiColor.white, HanabiColor.yellow),
+                              (HanabiColor.yellow, HanabiColor.blue),
+                              (HanabiColor.wild, HanabiColor.wild)])
+    def test__not_appears(self, color, unexpected_appearance):
+        assert not color.appears(unexpected_appearance)

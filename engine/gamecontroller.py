@@ -1,7 +1,6 @@
 from engine.board import Board
-from engine.color import Color
-from engine.deck import (Deck, WildDeck)
-from engine.gamestate import (GameState, PlayerGameState)
+from engine.deck import Deck
+from engine.gamestate import GameState, PlayerGameState
 from engine.move import Move
 from engine.player import Player
 
@@ -18,7 +17,7 @@ class GameController(object):
         for player in players:
             if not isinstance(player, Player):
                 raise Exception("All players must inherit from the Player class.")
-        self.colors = (Color('red'), Color('yellow'), Color('green'), Color('white'), Color('blue'))  # TODO: rainbow/mixed/wilds
+        self.colors = ('red', 'yellow', 'green', 'white', 'blue')  # TODO: rainbow/mixed/wilds
         self.numbers = (1, 1, 1, 2, 2, 3, 3, 4, 4, 5)
         self.players = players
         self.deck = Deck(colors=self.colors, numbers=self.numbers, seed=deck_seed)
