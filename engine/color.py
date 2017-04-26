@@ -3,13 +3,8 @@ from enum import Enum
 
 class MetaHanabiColor(type(Enum)):
 
-    color_count = 6  # Should be equal to the number of colors in the `HanabiColor` enum
-
-    def __init__(self, cls, enum, members):
-        super(MetaHanabiColor, self).__init__(cls, enum, members)
-
     def __contains__(self, item):
-        return item in self.__dict__
+        return item in self._member_map_
 
     def names(self):
         for name in self._member_names_:
@@ -20,6 +15,7 @@ class HanabiColor(Enum):
     """An enum of Hanabi card colors."""
     __metaclass__ = MetaHanabiColor
 
+    # Unique enum values are assigned in `__new__`
     blue, green, red, white, yellow, wild = (None, None, None, None, None, 0)
 
     def __init__(self, looks_like):
