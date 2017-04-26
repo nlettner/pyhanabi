@@ -2,6 +2,14 @@ from enum import Enum
 
 
 class MetaHanabiColor(type(Enum)):
+    """Metaclass for `HanabiColor`."""
+
+    def __call__(self, value, names=None, a_module=None, a_type=None, start=1):
+        if names is None:  # Simple lookup
+            if value in self:
+                return self._member_map_[value]
+            # Otherwise, let parent metaclass handle it.
+            return super(MetaHanabiColor, self).__call__(value, names=names, module=a_module, type=a_type, start=start)
 
     def __contains__(self, item):
         return item in self._member_map_

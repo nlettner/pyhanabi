@@ -4,13 +4,16 @@ import pytest
 
 class TestHanabiColor(object):
 
+    def test_constructor_element(self):
+        assert HanabiColor(HanabiColor.red) == HanabiColor.red
+
     def test_purple_element(self):
         with pytest.raises(AttributeError):
-            color = HanabiColor.purple
+            _ = HanabiColor.purple
 
     def test_getitem_purple(self):
         with pytest.raises(KeyError):
-            color = HanabiColor['purple']
+            _ = HanabiColor['purple']
 
     @pytest.mark.parametrize('expected_element',
                              ['blue',
@@ -21,6 +24,16 @@ class TestHanabiColor(object):
                               'wild'])
     def test__names_gen(self, expected_element):
         assert expected_element in HanabiColor.names()
+
+    @pytest.mark.parametrize('name,expected_item',
+                             [('blue', HanabiColor.blue),
+                              ('green', HanabiColor.green),
+                              ('red', HanabiColor.red),
+                              ('white', HanabiColor.white),
+                              ('yellow', HanabiColor.yellow),
+                              ('wild', HanabiColor.wild)])
+    def test_constructor_string(self, name, expected_item):
+        assert HanabiColor(name) == expected_item
 
     @pytest.mark.parametrize('name,expected_item',
                              [('blue', HanabiColor.blue),
@@ -104,7 +117,7 @@ class TestHanabiColor(object):
                               (HanabiColor.wild, HanabiColor.green),
                               (HanabiColor.wild, HanabiColor.red),
                               (HanabiColor.wild, HanabiColor.white),
-                              (HanabiColor.wild, HanabiColor.yellow),])
+                              (HanabiColor.wild, HanabiColor.yellow)])
     def test__appears(self, color, expected_appearance):
         assert color.appears(expected_appearance)
 
