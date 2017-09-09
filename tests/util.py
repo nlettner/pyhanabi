@@ -45,8 +45,12 @@ def create_mock_cardstack(r_get_score=None, r_is_legal_play=None, r_is_complete=
     return mock_cardstack
 
 
-def create_mock_deck(r_draw_card=None, r_len=None):
+def create_mock_deck(card_colors=None, card_numbers=None, r_draw_card=None, r_len=None):
     mock_deck = create_autospec(Deck)
+    if card_colors:
+        mock_deck.card_colors = card_colors
+    if card_numbers:
+        mock_deck.card_numbers = card_numbers
     if r_draw_card:
         mock_deck.draw_card.return_value = r_draw_card
     if r_len is not None:
