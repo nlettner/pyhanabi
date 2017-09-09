@@ -20,37 +20,43 @@ class TestMove(unittest.TestCase):
 
     def test_is_playable_play(self):
         """move.is_playable returns true so long as there's a card in that player's hand at that index."""
-        mock_gamestate = util.create_mock_gamestate(hand_split=4)
+        mock_gamestate = util.create_mock_gamestate(hands=[['card0', 'card1', 'card2', 'card3'],
+                                                           ['card4', 'card5', 'card6']])
         move = Move(move_type='play', player_index=0, card_index=3)
         assert move.is_playable(mock_gamestate) is True
 
     def test_is_playable_play_hand_too_small_fails(self):
         """move.is_playable returns false when there's no card in that player's hand at that index."""
-        mock_gamestate = util.create_mock_gamestate(hand_split=3)
+        mock_gamestate = util.create_mock_gamestate(hands=[['card0', 'card1', 'card2'],
+                                                           ['card3', 'card4', 'card5', 'card6']])
         move = Move(move_type='play', player_index=0, card_index=3)
         assert move.is_playable(mock_gamestate) is False
 
     def test_is_playable_play_bad_index_fails(self):
         """move.is_playable returns false when there's no card in that player's hand at that index."""
-        mock_gamestate = util.create_mock_gamestate(hand_split=3)
+        mock_gamestate = util.create_mock_gamestate(hands=[['card0', 'card1', 'card2'],
+                                                           ['card3', 'card4', 'card5', 'card6']])
         move = Move(move_type='play', player_index=0, card_index=-1)
         assert move.is_playable(mock_gamestate) is False
 
     def test_is_playable_discard(self):
         """move.is_playable returns true so long as there's a card in that player's hand at that index."""
-        mock_gamestate = util.create_mock_gamestate(hand_split=4)
+        mock_gamestate = util.create_mock_gamestate(hands=[['card0', 'card1', 'card2', 'card3'],
+                                                           ['card4', 'card5', 'card6']])
         move = Move(move_type='discard', player_index=0, card_index=3)
         assert move.is_playable(mock_gamestate) is True
 
     def test_is_playable_discard_hand_too_small_fails(self):
         """move.is_playable returns false when there's no card in that player's hand at that index."""
-        mock_gamestate = util.create_mock_gamestate(hand_split=3)
+        mock_gamestate = util.create_mock_gamestate(hands=[['card0', 'card1', 'card2'],
+                                                           ['card3', 'card4', 'card5', 'card6']])
         move = Move(move_type='discard', player_index=0, card_index=3)
         assert move.is_playable(mock_gamestate) is False
 
     def test_is_playable_discard_bad_index_fails(self):
         """move.is_playable returns false when there's no card in that player's hand at that index."""
-        mock_gamestate = util.create_mock_gamestate(hand_split=3)
+        mock_gamestate = util.create_mock_gamestate(hands=[['card0', 'card1', 'card2'],
+                                                           ['card3', 'card4', 'card5', 'card6']])
         move = Move(move_type='discard', player_index=0, card_index=-1)
         assert move.is_playable(mock_gamestate) is False
 
@@ -170,7 +176,8 @@ class TestMove(unittest.TestCase):
         assert move.is_playable(mock_gamestate) is False
 
     def test_apply_bad_move_fails(self):
-        mock_gamestate = util.create_mock_gamestate(hand_split=3)
+        mock_gamestate = util.create_mock_gamestate(hands=[['card0', 'card1', 'card2'],
+                                                           ['card3', 'card4', 'card5', 'card6']])
         move = Move(move_type='discard', player_index=0, card_index=-1)
         with pytest.raises(AssertionError) as excinfo:
             move.apply(mock_gamestate)

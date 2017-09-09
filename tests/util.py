@@ -72,13 +72,8 @@ def create_mock_board(clock_tokens=None, fuse_tokens=None, game_almost_over=None
         mock_board.compute_score.return_value = r_compute_score
     return mock_board
 
-
-def create_mock_gamestate(hands=None, cards=('card0', 'card1', 'card2', 'card3', 'card4', 'card5', 'card6'), hand_split=3):
+def create_mock_gamestate(hands=None):
     mock_gamestate = create_autospec(GameState)
     if hands is not None:
         mock_gamestate.player_hands = hands
-    elif cards is not None and hand_split is not None:
-        if hand_split < 0 or hand_split > len(cards):
-            hand_split = 3
-        mock_gamestate.player_hands = [cards[:hand_split], cards[hand_split:]]
     return mock_gamestate
