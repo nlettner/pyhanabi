@@ -10,46 +10,43 @@ from mock import create_autospec
 
 class TestGameController(unittest.TestCase):
 
+    def setUp(self):
+        self.player = create_autospec(Player)
+
     def test_constructor_fail_not_enough_players(self):
-        mock_player = create_autospec(Player)
         with pytest.raises(ValueError) as excinfo:
-            GameController(players=[mock_player])
+            GameController(players=[self.player])
         assert str(excinfo.value) == 'There must be between 2 and 5 players to play Hanabi.'
 
     def test_constructor_fail_too_many_players(self):
-        mock_player = create_autospec(Player)
         with pytest.raises(ValueError) as excinfo:
-            GameController(players=[mock_player, mock_player, mock_player,
-                                    mock_player, mock_player, mock_player])
+            GameController(players=[self.player, self.player, self.player,
+                                    self.player, self.player, self.player])
         assert str(excinfo.value) == 'There must be between 2 and 5 players to play Hanabi.'
 
     def test_deal_initial_hand_2p(self):
-        mock_player = create_autospec(Player)
-        gc = GameController([mock_player, mock_player])
+        gc = GameController([self.player, self.player])
         gc.deck = util.create_mock_deck(r_draw_card="card")
         gc.deal_initial_hand()
         assert len(gc.player_hands) == 2
         assert len(gc.player_hands[0]) == 5
 
     def test_deal_initial_hand_3p(self):
-        mock_player = create_autospec(Player)
-        gc = GameController([mock_player, mock_player, mock_player])
+        gc = GameController([self.player, self.player, self.player])
         gc.deck = util.create_mock_deck(r_draw_card="card")
         gc.deal_initial_hand()
         assert len(gc.player_hands) == 3
         assert len(gc.player_hands[0]) == 5
 
     def test_deal_initial_hand_4p(self):
-        mock_player = create_autospec(Player)
-        gc = GameController([mock_player, mock_player, mock_player, mock_player])
+        gc = GameController([self.player, self.player, self.player, self.player])
         gc.deck = util.create_mock_deck(r_draw_card="card")
         gc.deal_initial_hand()
         assert len(gc.player_hands) == 4
         assert len(gc.player_hands[0]) == 4
 
     def test_deal_initial_hand_5p(self):
-        mock_player = create_autospec(Player)
-        gc = GameController([mock_player, mock_player, mock_player, mock_player, mock_player])
+        gc = GameController([self.player, self.player, self.player, self.player, self.player])
         gc.deck = util.create_mock_deck(r_draw_card="card")
         gc.deal_initial_hand()
         assert len(gc.player_hands) == 5
@@ -57,15 +54,12 @@ class TestGameController(unittest.TestCase):
 
     # TODO: game_over: every escape case works, returns false when they have expected vals
     def test_game_over_no_fuse_tokens(self):
-        mock_player = create_autospec(Player)
-        gc = GameController([mock_player, mock_player])
+        gc = GameController([self.player, self.player])
         gc.master_game_state.board.fuse_tokens = 0
         self.assertIs(gc.game_over(0, gc.master_game_state), True)
 
     def test_game_over_all_stacks_completed(self):
-        mock_player = create_autospec(Player)
-        gc = GameController([mock_player, mock_player])
-        gc.master_game_state = create_autospec(GameState)
+        gc = GameController([self.player, self.player])
         gc.master_game_state.board = util.create_mock_board(fuse_tokens=1,
                                                             # Max score for a default game. Need to update when we add
                                                             # wilds / configurable color counts.
@@ -76,26 +70,20 @@ class TestGameController(unittest.TestCase):
         # TODO: There's a more-clear way to manage game state and track final player turn.
         # TODO: Finish writing this test, then refactor. Might even need to move game_over to GameState
         # Note, this doesn't need to know about the actual deck
-        mock_player = create_autospec(Player)
-        gc = GameController([mock_player, mock_player])
+        gc = GameController([self.player, self.player])
         gc.deck = util.create_mock_deck(r_len=0)
-        gc.master_game_state = create_autospec(GameState)
         gc.master_game_state.board = util.create_mock_board(fuse_tokens=1, game_almost_over=0)
         self.assertIs(gc.game_over(0, gc.master_game_state), True)
 
     def test_game_over_not_over_deck_not_empty(self):
-        mock_player = create_autospec(Player)
-        gc = GameController([mock_player, mock_player])
+        gc = GameController([self.player, self.player])
         gc.deck = util.create_mock_deck(r_len=1)
-        gc.master_game_state = create_autospec(GameState)
         gc.master_game_state.board = util.create_mock_board(fuse_tokens=1, game_almost_over=0)
         self.assertIs(gc.game_over(0, gc.master_game_state), False)
 
     def test_game_over_not_over_deck_empty(self):
-        mock_player = create_autospec(Player)
-        gc = GameController([mock_player, mock_player])
+        gc = GameController([self.player, self.player])
         gc.deck = util.create_mock_deck(r_len=0)
-        gc.master_game_state = create_autospec(GameState)
         gc.master_game_state.board = util.create_mock_board(fuse_tokens=1, game_almost_over=0)
         self.assertIs(gc.game_over(1, gc.master_game_state), False)
 
