@@ -16,8 +16,10 @@ def create_mock_card(number=None, color=None):
     return mock_card
 
 
-def create_mock_yourcard(public=False, number=None, color=None, public_number=None, public_color=None):
+def create_mock_yourcard(in_your_hand=None, public=False, number=None, color=None, public_number=None, public_color=None):
     mock_yourcard = create_autospec(YourCard)
+    if in_your_hand is not None:
+        mock_yourcard.in_your_hand = in_your_hand
     if not public:
         if public_number is not None:
             mock_yourcard.public_number = public_number
