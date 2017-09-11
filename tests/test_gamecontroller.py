@@ -13,14 +13,14 @@ def mock_player():
 
 @pytest.fixture(scope="module")
 def mock_deck():
-    return util.create_mock_deck(r_draw_card='card')
+    return util.create_mock_deck(return_draw_card='card')
 
 
 @pytest.fixture(scope='function')
-def gc(mock_player):
-    _gc = GameController([mock_player, mock_player])
-    _gc.master_game_state = util.create_mock_gamestate()
-    return _gc
+def gamecontroller(mock_player):
+    gc = GameController([mock_player, mock_player])
+    gc.master_game_state = util.create_mock_gamestate()
+    return gc
 
 
 @pytest.mark.parametrize(argnames='player_count', argvalues=[1, 6])
@@ -40,17 +40,17 @@ def test_deal_initial_hand_2p(player_count, expected_hand_size, mock_player, moc
 
 
 # TODO: game_over: every escape case works, returns false when they have expected vals
-def test_game_over_no_fuse_tokens(gc):
-    gc.master_game_state.board = util.create_mock_board(fuse_tokens=0)
-    assert gc.game_over(0, gc.master_game_state)
+def test_game_over_no_fuse_tokens(gamecontroller):
+    gamecontroller.master_game_state.board = util.create_mock_board(fuse_tokens=0)
+    assert gamecontroller.game_over(0, gamecontroller.master_game_state)
 
 
-def test_game_over_all_stacks_completed(gc):
-    gc.master_game_state.board = util.create_mock_board(fuse_tokens=1,
-                                                        # Max score for a default game. Need to update when we add
-                                                        # wilds / configurable color counts.
-                                                        r_compute_score=25)
-    assert gc.game_over(0, gc.master_game_state)
+def test_game_over_all_stacks_completed(gamecontroller):
+    gamecontroller.master_game_state.board = util.create_mock_board(fuse_tokens=1,
+                                                                    # Max score for a default game. Need to update when
+                                                                    # we add wilds / configurable color counts.
+                                                                    return_compute_score=25)
+    assert gamecontroller.game_over(0, gamecontroller.master_game_state)
 
 
 # TODO: There's a more-clear way to manage game state and track final player turn.
@@ -58,10 +58,10 @@ def test_game_over_all_stacks_completed(gc):
 # Note, this doesn't need to know about the actual deck
 @pytest.mark.parametrize(argnames=('deck_length', 'current_turn', 'expected_game_state'),
                          argvalues=((0, 0, True), (1, 0, False), (0, 1, False)))
-def test_game_over_last_turn(gc, deck_length, current_turn, expected_game_state):
-    gc.deck = util.create_mock_deck(r_len=deck_length)
-    gc.master_game_state.board = util.create_mock_board(fuse_tokens=1, game_almost_over=0)
-    assert gc.game_over(current_turn, gc.master_game_state) is expected_game_state
+def test_game_over_last_turn(gamecontroller, deck_length, current_turn, expected_game_state):
+    gamecontroller.deck = util.create_mock_deck(return_len=deck_length)
+    gamecontroller.master_game_state.board = util.create_mock_board(fuse_tokens=1, game_almost_over=0)
+    assert gamecontroller.game_over(current_turn, gamecontroller.master_game_state) is expected_game_state
 
 
 # TODO: Test play_game fails if player cannot make_move (may belong in make_move?)

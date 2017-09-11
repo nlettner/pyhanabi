@@ -6,18 +6,18 @@ import util
 
 
 @pytest.fixture(scope="module")
-def card():
+def mock_card():
     return util.create_mock_card(number=2, color='blue')
 
 
 @pytest.fixture(scope="module")
-def your_card():
+def mock_your_card():
     return util.create_mock_yourcard(public_number=False, public_color=False)
 
 
 @pytest.fixture(scope='module')
 def mock_deck():
-    return util.create_mock_deck(card_colors=('red', 'blue'), card_numbers=(1, 2, 2, 3), r_len=40)
+    return util.create_mock_deck(card_colors=('red', 'blue'), card_numbers=(1, 2, 2, 3), return_len=40)
 
 
 @pytest.fixture(scope='function')
@@ -26,12 +26,16 @@ def board(mock_deck):
 
 
 def test_init_creates_expected_cardstacks(board, mock_deck):
+    # Ensure that mock_deck requires at least 1 CardStack
+    assert len(mock_deck.card_colors) > 0
     # Check that there's a stack for each color in the deck
     for color in mock_deck.card_colors:
         assert isinstance(board.card_stacks[color], CardStack)
 
 
-def xtest_init_creates_discard_stats(board, mock_deck):
+def test_init_creates_discard_stats(board, mock_deck):
+    # Ensure that mock_deck requires at least 1 CardStack
+    assert len(mock_deck.card_colors) > 0
     # Assert there's a discard pile with a length:
     assert len(board.discard) == 0
     # Assert there's a discard_stats list with one counter per card number
@@ -39,22 +43,22 @@ def xtest_init_creates_discard_stats(board, mock_deck):
         assert len(board.discard_stats[color]) == len(set(mock_deck.card_numbers))
 
 
-def test_discard_card_to_discard(board, card):
-    assert card not in board.discard
-    board.discard_card(card)
-    assert card in board.discard
+def test_discard_card_to_discard(board, mock_card):
+    assert mock_card not in board.discard
+    board.discard_card(mock_card)
+    assert mock_card in board.discard
 
 
-def test_discard_card_your_card(board, your_card):
-    assert your_card not in board.discard
-    board.discard_card(your_card)
-    assert your_card in board.discard
+def test_discard_card_your_card(board, mock_your_card):
+    assert mock_your_card not in board.discard
+    board.discard_card(mock_your_card)
+    assert mock_your_card in board.discard
 
 
-def test_discard_card_updates_stats(board, card):
-    discarded_count = board.discard_stats[card.color][card.number]
-    board.discard_card(card)
-    assert board.discard_stats[card.color][card.number] == discarded_count + 1
+def test_discard_card_updates_stats(board, mock_card):
+    discarded_count = board.discard_stats[mock_card.color][mock_card.number]
+    board.discard_card(mock_card)
+    assert board.discard_stats[mock_card.color][mock_card.number] == discarded_count + 1
 
 
 def test_use_clock_token(board):
@@ -83,9 +87,8 @@ def test_use_fuse_token_no_tokens(board):
 
 def test_add_clock_token(board):
     board.clock_tokens = 1
-    token_count = board.clock_tokens
     board.add_clock_token()
-    assert board.clock_tokens == token_count + 1
+    assert board.clock_tokens == 2
 
 
 def test_add_clock_token_full(board):
@@ -104,10 +107,11 @@ def test_get_card_stack_bad_color(board):
 
 
 def test_compute_score_zero(board):
+    # New boards should have a score of 0
     assert board.compute_score() == 0
 
 
 def test_compute_score_non_zero(board):
-    board.card_stacks['red'] = util.create_mock_cardstack(r_get_score=3)
-    board.card_stacks['blue'] = util.create_mock_cardstack(r_get_score=2)
+    board.card_stacks['red'] = util.create_mock_cardstack(return_get_score=3)
+    board.card_stacks['blue'] = util.create_mock_cardstack(return_get_score=2)
     assert board.compute_score() == 5

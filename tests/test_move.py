@@ -7,7 +7,7 @@ import util
 # TODO: Are some of these integration tests?
 
 @pytest.fixture(scope='function')
-def card():
+def mock_card():
     return util.create_mock_card()
 
 
@@ -37,7 +37,7 @@ def four_card():
 
 
 @pytest.fixture(scope='module')
-def your_card():
+def mock_your_card():
     return util.create_mock_yourcard(public=True, number=2, color='blue')
 
 
@@ -99,8 +99,8 @@ def test_is_playable_information_color(mock_hand, blue_card):
 
 
 @pytest.mark.parametrize(argnames=['info_type', 'info'], argvalues=(('color', 'blue'), ('number', 2)))
-def test_is_playable_information_known(info_type, info, your_card, mock_hand):
-    mock_gamestate = create_mock_gamestate(hands=[[your_card, your_card], mock_hand])
+def test_is_playable_information_known(info_type, info, mock_your_card, mock_hand):
+    mock_gamestate = create_mock_gamestate(hands=[[mock_your_card, mock_your_card], mock_hand])
     info_dict = {'player_id': 0, 'information_type': info_type, 'information': info}
     move = Move(move_type='give_information', player_index=1, information=info_dict)
     assert move.is_playable(mock_gamestate)
@@ -185,11 +185,11 @@ def test_apply_bad_move_fails(default_hands_3_4):
     assert str(excinfo.value) == 'Cannot apply move discard card index -1 in their hand, not playable.'
 
 
-def test_apply_discard(card):
+def test_apply_discard(mock_card):
     """Discard should remove a card from the player's hand, add it to the discard pile and add back a clock token.
     """
     to_discard = util.create_mock_card()
-    mock_gamestate = create_mock_gamestate(hands=[[card], [card, to_discard]], clock_tokens=None)
+    mock_gamestate = create_mock_gamestate(hands=[[mock_card], [mock_card, to_discard]], clock_tokens=None)
     move = Move(move_type='discard', player_index=1, card_index=1)
     mock_gamestate = move.apply(game_state=mock_gamestate)
     assert len(mock_gamestate.player_hands[1]) == 1
@@ -197,12 +197,12 @@ def test_apply_discard(card):
     mock_gamestate.board.add_clock_token.assert_called_once()
 
 
-def test_apply_play_blow_fuse(card):
+def test_apply_play_blow_fuse(mock_card):
     """Play (blow fuse) should discard the card marked for play and call board.use_fuse_token"""
     to_play = util.create_mock_card(color='red')
-    mock_gamestate = util.create_mock_gamestate(hands=[[card], [to_play, card]])
-    mock_stack = util.create_mock_cardstack(r_is_legal_play=False)
-    mock_gamestate.board = util.create_mock_board(r_get_card_stack=mock_stack)
+    mock_gamestate = util.create_mock_gamestate(hands=[[mock_card], [to_play, mock_card]])
+    mock_stack = util.create_mock_cardstack(return_is_legal_play=False)
+    mock_gamestate.board = util.create_mock_board(return_get_card_stack=mock_stack)
     move = Move(move_type='play', player_index=1, card_index=0)
     mock_gamestate = move.apply(game_state=mock_gamestate)
     mock_gamestate.board.get_card_stack.assert_called_with('red')
@@ -211,16 +211,16 @@ def test_apply_play_blow_fuse(card):
     mock_gamestate.board.discard_card.assert_called_with(to_play)
 
 
-def test_apply_play_successful_play_incomplete_stack(card):
+def test_apply_play_successful_play_incomplete_stack(mock_card):
     """Play (successful) should 
             remove the card from hand, 
             add it to the stack of the right color, 
             not call board.add_clock_token
     """
     to_play = util.create_mock_card(color='green')
-    mock_gamestate = util.create_mock_gamestate(hands=[[card], [to_play, card]])
-    mock_stack = util.create_mock_cardstack(r_is_legal_play=True, r_is_complete=False)
-    mock_gamestate.board = util.create_mock_board(r_get_card_stack=mock_stack)
+    mock_gamestate = util.create_mock_gamestate(hands=[[mock_card], [to_play, mock_card]])
+    mock_stack = util.create_mock_cardstack(return_is_legal_play=True, return_is_complete=False)
+    mock_gamestate.board = util.create_mock_board(return_get_card_stack=mock_stack)
     move = Move(move_type='play', player_index=1, card_index=0)
     mock_gamestate = move.apply(game_state=mock_gamestate)
     mock_gamestate.board.get_card_stack.assert_called_with('green')
@@ -229,16 +229,16 @@ def test_apply_play_successful_play_incomplete_stack(card):
     mock_gamestate.board.add_clock_token.assert_not_called()
 
 
-def test_apply_play_successful_play_complete_stack(card):
+def test_apply_play_successful_play_complete_stack(mock_card):
     """Play (successful) should 
               remove the card from hand, 
               add it to the stack of the right color, 
               call board.add_clock_token
     """
     to_play = util.create_mock_card(color='green')
-    mock_gamestate = util.create_mock_gamestate(hands=[[card], [to_play, card]])
-    mock_stack = util.create_mock_cardstack(r_is_legal_play=True, r_is_complete=True)
-    mock_gamestate.board = util.create_mock_board(r_get_card_stack=mock_stack)
+    mock_gamestate = util.create_mock_gamestate(hands=[[mock_card], [to_play, mock_card]])
+    mock_stack = util.create_mock_cardstack(return_is_legal_play=True, return_is_complete=True)
+    mock_gamestate.board = util.create_mock_board(return_get_card_stack=mock_stack)
     move = Move(move_type='play', player_index=1, card_index=0)
     mock_gamestate = move.apply(game_state=mock_gamestate)
     mock_gamestate.board.get_card_stack.assert_called_with('green')

@@ -34,31 +34,34 @@ def create_mock_yourcard(public=False, number=None, color=None, public_number=No
     return mock_yourcard
 
 
-def create_mock_cardstack(r_get_score=None, r_is_legal_play=None, r_is_complete=None):
+def create_mock_cardstack(color=None, return_get_score=None, return_is_legal_play=None, return_is_complete=None):
     mock_cardstack = create_autospec(CardStack)
-    if r_get_score is not None:
-        mock_cardstack.get_score.return_value = r_get_score
-    if r_is_legal_play is not None:
-        mock_cardstack.is_legal_play.return_value = r_is_legal_play
-    if r_is_complete is not None:
-        mock_cardstack.is_complete.return_value = r_is_complete
+    if color is not None:
+        mock_cardstack.color = color
+    if return_get_score is not None:
+        mock_cardstack.get_score.return_value = return_get_score
+    if return_is_legal_play is not None:
+        mock_cardstack.is_legal_play.return_value = return_is_legal_play
+    if return_is_complete is not None:
+        mock_cardstack.is_complete.return_value = return_is_complete
     return mock_cardstack
 
 
-def create_mock_deck(card_colors=None, card_numbers=None, r_draw_card=None, r_len=None):
+def create_mock_deck(card_colors=None, card_numbers=None, return_draw_card=None, return_len=None):
     mock_deck = create_autospec(Deck)
     if card_colors:
         mock_deck.card_colors = card_colors
     if card_numbers:
         mock_deck.card_numbers = card_numbers
-    if r_draw_card:
-        mock_deck.draw_card.return_value = r_draw_card
-    if r_len is not None:
-        mock_deck.__len__.return_value = r_len
+    if return_draw_card:
+        mock_deck.draw_card.return_value = return_draw_card
+    if return_len is not None:
+        mock_deck.__len__.return_value = return_len
     return mock_deck
 
 
-def create_mock_board(clock_tokens=None, fuse_tokens=None, game_almost_over=None, r_get_card_stack=None, r_compute_score=None):
+def create_mock_board(clock_tokens=None, fuse_tokens=None, game_almost_over=None,
+                      return_get_card_stack=None, return_compute_score=None):
     mock_board = create_autospec(Board)
     if clock_tokens is not None:
         mock_board.clock_tokens = clock_tokens
@@ -66,10 +69,10 @@ def create_mock_board(clock_tokens=None, fuse_tokens=None, game_almost_over=None
         mock_board.fuse_tokens = fuse_tokens
     if game_almost_over is not None:
         mock_board.game_almost_over = game_almost_over
-    if r_get_card_stack is not None:
-        mock_board.get_card_stack.return_value = r_get_card_stack
-    if r_compute_score is not None:
-        mock_board.compute_score.return_value = r_compute_score
+    if return_get_card_stack is not None:
+        mock_board.get_card_stack.return_value = return_get_card_stack
+    if return_compute_score is not None:
+        mock_board.compute_score.return_value = return_compute_score
     return mock_board
 
 def create_mock_gamestate(hands=None):
